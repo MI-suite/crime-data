@@ -35,4 +35,4 @@ agendaInstance.agenda.define(THEFT_JOB, async () => {
 });
 
 agendaInstance.agenda.start();
-agendaInstance.agenda.every('5 minutes', THEFT_JOB)
+agendaInstance.agenda.every('5 minutes', THEFT_JOB);
