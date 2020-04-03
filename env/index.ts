@@ -12,8 +12,8 @@ export const PROD_SERVER = process.env.PROD_SERVER || '';
 
 // postgresql credentials
 export const PG_TEST_DB_NAME = process.env.PG_TEST_DB_NAME;
-export const HEROKU_POSTGRESQL_AMBER_URL =
-    process.env.HEROKU_POSTGRESQL_AMBER_URL;
+export const PROD_PG_URL =
+    process.env.PROD_PG_URL || '';
 
 export const PG_USER = process.env.PG_USER;
 export const PG_PASSWORD = process.env.PG_PASSWORD;

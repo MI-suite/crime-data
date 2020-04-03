@@ -5,29 +5,26 @@ import {
     PG_PORT,
     PG_NAME,
     NODE_ENV,
-    HEROKU_POSTGRESQL_AMBER_URL,
+    PROD_PG_URL,
     PG_TEST_DB_NAME,
 } from '../../env/index';
 import { PRODUCTION, TEST } from '../../settings';
 
 interface IDBConfig {
-    connectionString?: string;
-    database?: string;
+    connectionString: string;
 }
 
-const DATABASE_URL: string =
-    `postgres://${PG_USER}:${PG_PASSWORD}@${PG_HOST}:${PG_PORT}/${PG_NAME}`;
+const BASE_URL: string =
+    `postgres://${PG_USER}:${PG_PASSWORD}@${PG_HOST}:${PG_PORT}`;
 
-export let config: IDBConfig = {
-    connectionString: DATABASE_URL,
+export const config: IDBConfig = {
+    connectionString: `${BASE_URL}/${PG_NAME}`,
 };
 
 if (NODE_ENV.match(PRODUCTION)) {
-    config = {
-        connectionString: HEROKU_POSTGRESQL_AMBER_URL,
-    };
+    config.connectionString = PROD_PG_URL;
 }
 
 if (NODE_ENV.match(TEST)) {
-    config.database = PG_TEST_DB_NAME;
+    config.connectionString = `${BASE_URL}${PG_TEST_DB_NAME}`;
 }
