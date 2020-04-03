@@ -31,7 +31,7 @@ export class KafkaClient {
     public connectProducer = async (): Promise<void> => {
         const CONNECTION_EVENT = 'producer.connect';
 
-        await this.producer.connect();
+        this.producer.connect();
 
         this.producer.on(CONNECTION_EVENT, () => {
             console.log('KafkaClient:::connectProducer: Producer connected');

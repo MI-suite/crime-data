@@ -5,4 +5,3 @@ import './healthCheckPing';
 import './registerServices';
 
 export * from './middleware';
-

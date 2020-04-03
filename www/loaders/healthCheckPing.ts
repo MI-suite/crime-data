@@ -13,16 +13,16 @@ const APP_URL: string = NODE_ENV.match(DEVELOPMENT)
     : PROD_SERVER;
 
 const HTTP_PROTOCOL = NODE_ENV.match(DEVELOPMENT) ? http : https;
-const PING_INTERVAL: number = 1000 * 60 * 60;
+const PING_INTERVAL: number = 1000 * 60;
 
 const handlePing = (): void => {
-    if (!NODE_ENV.match(PRODUCTION)) {
+    if (!NODE_ENV.match(PRODUCTION) && !NODE_ENV.match(DEVELOPMENT)) {
         return;
     }
 
     setInterval((): void => {
-        HTTP_PROTOCOL.get(`${APP_URL}/health`, () => {
-            console.log('Health check complete');
+        HTTP_PROTOCOL.get(`${APP_URL}/api/v1/health`, (res) => {
+            console.log('Health check complete', res.statusMessage);
         });
     }, PING_INTERVAL);
 };
