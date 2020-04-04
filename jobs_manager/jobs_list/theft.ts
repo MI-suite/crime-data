@@ -1,14 +1,14 @@
 import { Container } from 'typedi';
 
 import { Redis } from '../../cache/redis';
-import { KafkaClient } from '../../pubsub/kafka/index';
-import { CrimesService } from '../../services';
+import { PubSub } from '../../pubsub';
+import { CrimesService } from '../../services/CrimesService';
 import { AgendaScheduler } from '../Agenda';
 import { THEFT_JOB } from '../constants';
 
 const agendaInstance = Container.get(AgendaScheduler);
 const crimeService = Container.get(CrimesService);
-const kafkaClient = Container.get(KafkaClient);
+const pubsub = Container.get(PubSub);
 const redisInstance = Container.get(Redis);
 
 agendaInstance.agenda.define(THEFT_JOB, async () => {
@@ -28,7 +28,7 @@ agendaInstance.agenda.define(THEFT_JOB, async () => {
 
     redisInstance.addDataToRedis(THEFT_JOB, newOffset);
 
-    await kafkaClient.publish({
+    pubsub.publish({
         topic: KAFKA_TOPIC,
         message: data,
     });

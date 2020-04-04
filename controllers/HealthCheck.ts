@@ -5,6 +5,7 @@ import { Redis } from '../cache/redis';
 import { Mongo } from '../database/mongoDB/index';
 import { PG } from '../database/postgresql';
 import { AgendaScheduler } from '../jobs_manager/Agenda';
+import { KafkaClient } from '../kafka/index';
 
 @Controller('/health')
 export class HealthCheck {
@@ -14,6 +15,8 @@ export class HealthCheck {
         Container.get(Mongo);
         Container.get(PG);
         Container.get(Redis);
+        await Container.get(KafkaClient).connectProducer();
+        await Container.get(KafkaClient).disconnectProducer();
 
         return true;
     }
