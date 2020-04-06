@@ -1,7 +1,6 @@
 import { Container } from 'typedi';
 
 import { Redis } from '../../cache/redis';
-import { KAFKA_THEFT_TOPIC } from '../../env';
 import { PubSub } from '../../pubsub';
 import { CrimesService } from '../../services/CrimesService';
 import { AgendaScheduler } from '../Agenda';
@@ -13,7 +12,7 @@ const pubsub = Container.get(PubSub);
 const redisInstance = Container.get(Redis);
 
 agendaInstance.agenda.define(THEFT_JOB, async () => {
-    const KAFKA_TOPIC = KAFKA_THEFT_TOPIC;
+    const KAFKA_TOPIC = 'kafka-test';
     const MODEL = 'chicago_crimes';
     const CASE_TYPE = 'THEFT';
     const LIMIT = 1000;
@@ -27,17 +26,13 @@ agendaInstance.agenda.define(THEFT_JOB, async () => {
         caseType: CASE_TYPE,
     });
 
-    if (!data || !data.length) {
-        return;
-    }
+    redisInstance.addDataToRedis(THEFT_JOB, newOffset);
 
-    await pubsub.publish({
+    pubsub.publish({
         topic: KAFKA_TOPIC,
         message: data,
     });
-
-    redisInstance.addDataToRedis(THEFT_JOB, newOffset);
 });
 
 agendaInstance.agenda.start();
-agendaInstance.agenda.every('10 seconds', THEFT_JOB);
+agendaInstance.agenda.every('5 minutes', THEFT_JOB);

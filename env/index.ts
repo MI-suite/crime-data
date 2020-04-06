@@ -39,4 +39,3 @@ export const KAFKA_BROKERS = [
     process.env.KAFKA_BROKER_1 || '',
     process.env.KAFKA_BROKER_2 || '',
 ];
-export const KAFKA_THEFT_TOPIC = process.env.KAFKA_THEFT_TOPIC || '';

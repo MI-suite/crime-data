@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 
-import { BaseRepository } from '../repository';
+import { BaseRepository } from '../repository/index';
 
 interface IGetCrimeData {
     model: string;
