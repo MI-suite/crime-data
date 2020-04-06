@@ -7,7 +7,7 @@ import {
     NODE_ENV,
     PROD_PG_URL,
     PG_TEST_DB_NAME,
-} from '../../env/index';
+} from '../../env';
 import { PRODUCTION, TEST } from '../../settings';
 
 interface IDBConfig {

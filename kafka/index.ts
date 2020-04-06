@@ -3,7 +3,7 @@ import {
 } from 'kafkajs';
 import { Service } from 'typedi';
 
-import { KAFKA_CLIENT_ID, KAFKA_BROKERS } from '../env/index';
+import { KAFKA_CLIENT_ID, KAFKA_BROKERS } from '../env';
 import { IPubSuB } from '../pubsub/pubsub.interface';
 import { UNCAUGHT_EXCEPTION, UNHANDLED_REJECTION } from '../settings';
 
