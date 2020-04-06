@@ -2,10 +2,10 @@ import { Controller, Get } from 'routing-controllers';
 import { Container } from 'typedi';
 
 import { Redis } from '../cache/redis';
-import { Mongo } from '../database/mongoDB/index';
+import { Mongo } from '../database/mongoDB';
 import { PG } from '../database/postgresql';
 import { AgendaScheduler } from '../jobs_manager/Agenda';
-import { KafkaClient } from '../kafka/index';
+import { KafkaClient } from '../kafka';
 
 @Controller('/health')
 export class HealthCheck {
