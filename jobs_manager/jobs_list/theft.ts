@@ -13,18 +13,19 @@ const pubsub = Container.get(PubSub);
 const redisInstance = Container.get(Redis);
 
 agendaInstance.agenda.define(THEFT_JOB, async () => {
-    const KAFKA_TOPIC = KAFKA_THEFT_TOPIC;
+    const LAST_SERIAL_NUMBER_KEY = `LAST_SERIAL_NUMBER_KEY:::${THEFT_JOB}`;
     const MODEL = 'chicago_crimes';
     const CASE_TYPE = 'THEFT';
-    const LIMIT = 1000;
-    const currentOffset = await redisInstance.getDataFromRedis(THEFT_JOB) || 0;
-    const newOffset = currentOffset + LIMIT;
+    const KAFKA_TOPIC = KAFKA_THEFT_TOPIC;
+    const LIMIT = 2000;
+    const lastSerialNumber =
+        await redisInstance.getDataFromRedis(LAST_SERIAL_NUMBER_KEY) || 0;
 
-    const data = await crimeService.getCrimeData({
+    const data = await crimeService.getCrimeDataByType({
         model: MODEL,
-        offset: currentOffset,
         limit: LIMIT,
         caseType: CASE_TYPE,
+        lastSN: lastSerialNumber,
     });
 
     if (!data || !data.length) {
@@ -36,7 +37,7 @@ agendaInstance.agenda.define(THEFT_JOB, async () => {
         message: data,
     });
 
-    redisInstance.addDataToRedis(THEFT_JOB, newOffset);
+    redisInstance.addDataToRedis(LAST_SERIAL_NUMBER_KEY, data[data.length - 1].SN);
 });
 
 agendaInstance.agenda.start();
