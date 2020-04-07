@@ -4,9 +4,9 @@ import { BaseRepository } from '../repository';
 
 interface IGetCrimeData {
     model: string;
-    offset: number;
     limit: number;
     caseType: string;
+    lastSN: number;
 }
 
 @Service()
@@ -17,15 +17,16 @@ export class CrimesService {
         this.repository = repository;
     }
 
-    public async getCrimeData (config: IGetCrimeData): Promise<any> {
-        const { model, offset, limit, caseType } = config;
+    public async getCrimeDataByType (config: IGetCrimeData): Promise<any> {
+        const { model, limit, caseType, lastSN } = config;
 
         const query = `
-            select *
+            select "${model}".*
             FROM "${model}"
             WHERE "${model}"."Primary Type" = '${caseType.trim().toUpperCase()}'
-            LIMIT ${limit}
-            OFFSET ${offset};
+                AND "${model}"."SN" > ${lastSN}
+            ORDER BY "${model}"."SN" ASC
+            FETCH FIRST ${limit} ROWS ONLY;
         `;
         const data = await this.repository.find({
             text: query,
