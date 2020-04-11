@@ -14,6 +14,7 @@ export class PG {
 
     public constructor () {
         this.db = new Pool(config);
+        console.log('-------------------------------', config);
 
         this.createConnection();
     }
@@ -47,7 +48,7 @@ export class PG {
 
             return executedQuery;
         } catch (error) {
-            console.error(`PG:::query: Error eexcuting query::::::::${error}`);
+            console.error(`PG:::query: Error executing query::::::::${error}`);
 
             return error;
         }

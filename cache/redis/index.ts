@@ -17,7 +17,6 @@ export class Redis {
      */
     private createClient = (): RedisClient => {
         const redisClient: RedisClient = redis.createClient(REDIS_URL);
-
         redisClient.on('connect', () => {
             console.log(
                 'Redis:::createClient: Connection to redis established',

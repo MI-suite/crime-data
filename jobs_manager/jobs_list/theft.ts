@@ -14,7 +14,7 @@ const redisInstance = Container.get(Redis);
 
 agendaInstance.agenda.define(THEFT_JOB, async () => {
     const LAST_SERIAL_NUMBER_KEY = `LAST_SERIAL_NUMBER_KEY:::${THEFT_JOB}`;
-    const MODEL = 'chicago_crimes';
+    const MODEL = 'crimes.all';
     const CASE_TYPE = 'THEFT';
     const KAFKA_TOPIC = KAFKA_THEFT_TOPIC;
     const LIMIT = 2000;

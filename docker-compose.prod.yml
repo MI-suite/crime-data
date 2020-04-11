@@ -2,12 +2,32 @@ version: "3"
 
 services:
     redis:
-        container_name: redis_cache
+        container_name: crimes_redis_cache
         image: redis:alpine
         expose:
             - 6379
         networks:
             - app-network
+
+    crimes_zookeeper_container:
+        image: wurstmeister/zookeeper:latest
+        ports:
+            - "2181:2181"
+
+    crimes_kafka_container:
+        image: wurstmeister/kafka:2.11-1.1.1
+        ports:
+            - "9092:9092"
+        links:
+            - crimes_zookeeper_container
+        environment:
+            KAFKA_ADVERTISED_HOST_NAME: host.docker.internal
+            KAFKA_ZOOKEEPER_CONNECT: crimes_zookeeper_container:2181
+            KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+            KAFKA_DELETE_TOPIC_ENABLE: 'true'
+            KAFKA_CREATE_TOPICS: "topic-test:1:1"
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
 
     crimes:
         build:
@@ -18,29 +38,28 @@ services:
         restart: unless-stopped
         env_file: .env
         ports:
-            - "4000:4000"
+            - "8080:8080"
         links:
-            - pgdb_container
+            - pg_container
             - mongodb_container
-            - redis:redis_cache
+            - redis:crimes_redis_cache
         depends_on:
-            - pgdb_container
+            - pg_container
             - mongodb_container
             - redis
-        volumes:
-            - .:/home/node/app
-            - node_modules:/home/node/app/node_modules
         environment:
-            - REDIS_URL=redis://redis-cache
+            - REDIS_URL=redis://crimes_redis_cache
             - PG_PORT=54320
             - PG_PASSWORD=postgres
             - PG_USER=postgres
+            - PG_NAME=postgres
             - PG_HOST=host.docker.internal
+            - KAFKA_ADVERTISED_HOST_NAME=host.docker.internal
+            - MONGO_DEV_DB=mongodb://host.docker.internal:27017
         networks:
             - app-network
-        command: npm start
 
-    pgdb_container:
+    pg_container:
         image: postgres
         environment:
             POSTGRES_DB: crimes
@@ -51,7 +70,7 @@ services:
         networks:
             - app-network
         volumes:
-            - ./pgdb_container:/var/lib/postgresql/data
+            - ./pg_container:/var/lib/postgresql/data
 
     mongodb_container:
         image: mongo:latest
@@ -61,12 +80,11 @@ services:
         ports:
             - 27017:27017
         volumes:
-            - mongodb_data_container:/data/db
+            - ./mongodb_data_container:/data/db
 
 networks:
     app-network:
         driver: bridge
 
 volumes:
-    node_modules:
     mongodb_data_container:
