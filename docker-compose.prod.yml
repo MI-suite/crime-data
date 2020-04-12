@@ -2,51 +2,31 @@ version: "3"
 
 services:
     redis:
-        container_name: crimes_redis_cache
-        image: redis:alpine
         expose:
             - 6379
-        networks:
-            - app-network
 
     crimes_zookeeper_container:
-        image: wurstmeister/zookeeper:latest
         ports:
             - "2181:2181"
 
     crimes_kafka_container:
-        image: wurstmeister/kafka:2.11-1.1.1
         ports:
             - "9092:9092"
-        links:
-            - crimes_zookeeper_container
         environment:
             KAFKA_ADVERTISED_HOST_NAME: host.docker.internal
             KAFKA_ZOOKEEPER_CONNECT: crimes_zookeeper_container:2181
             KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
             KAFKA_DELETE_TOPIC_ENABLE: 'true'
             KAFKA_CREATE_TOPICS: "topic-test:1:1"
-        volumes:
-            - /var/run/docker.sock:/var/run/docker.sock
 
-    crimes:
+    crimes_container:
         build:
             context: .
             dockerfile: Dockerfile
-        image: crimes_image
-        container_name: crimes_container
         restart: unless-stopped
         env_file: .env
         ports:
             - "8080:8080"
-        links:
-            - pg_container
-            - mongodb_container
-            - redis:crimes_redis_cache
-        depends_on:
-            - pg_container
-            - mongodb_container
-            - redis
         environment:
             - REDIS_URL=redis://crimes_redis_cache
             - PG_PORT=54320
@@ -56,35 +36,18 @@ services:
             - PG_HOST=host.docker.internal
             - KAFKA_ADVERTISED_HOST_NAME=host.docker.internal
             - MONGO_DEV_DB=mongodb://host.docker.internal:27017
-        networks:
-            - app-network
 
     pg_container:
-        image: postgres
         environment:
             POSTGRES_DB: crimes
             POSTGRES_PASSWORD: postgres
         ports:
             - "54320:5432"
         restart: always
-        networks:
-            - app-network
-        volumes:
-            - ./pg_container:/var/lib/postgresql/data
 
     mongodb_container:
-        image: mongo:latest
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: rootpassword
         ports:
             - 27017:27017
-        volumes:
-            - ./mongodb_data_container:/data/db
-
-networks:
-    app-network:
-        driver: bridge
-
-volumes:
-    mongodb_data_container:

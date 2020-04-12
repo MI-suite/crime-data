@@ -18,9 +18,6 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock
 
     crimes_container:
-        build:
-            context: .
-            dockerfile: Dockerfile
         image: crimes_image
         env_file: .env
         links:
@@ -36,7 +33,6 @@ services:
 
     pg_container:
         image: postgres
-        restart: always
         networks:
             - app-network
         volumes:

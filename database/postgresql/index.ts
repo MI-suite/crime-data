@@ -14,7 +14,6 @@ export class PG {
 
     public constructor () {
         this.db = new Pool(config);
-        console.log('-------------------------------', config);
 
         this.createConnection();
     }
