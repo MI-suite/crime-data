@@ -111,3 +111,8 @@ temp/
 # End of https://www.gitignore.io/api/node
 
 .DS_STORE
+
+pgdb_container
+pg_container
+.npm-global
+mongodb_data_container

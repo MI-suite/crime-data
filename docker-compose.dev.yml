@@ -1,0 +1,55 @@
+version: "3"
+
+services:
+    redis:
+        expose:
+            - 6379
+
+    crimes_zookeeper_container:
+        ports:
+            - "2181:2181"
+
+    crimes_kafka_container:
+        ports:
+            - "9092:9092"
+        environment:
+            KAFKA_ADVERTISED_HOST_NAME: host.docker.internal
+            KAFKA_ZOOKEEPER_CONNECT: crimes_zookeeper_container:2181
+            KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+            KAFKA_DELETE_TOPIC_ENABLE: 'true'
+            KAFKA_CREATE_TOPICS: "topic-test:1:1"
+
+    crimes_container:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        env_file: .env
+        ports:
+            - "4000:4000"
+        environment:
+            - REDIS_URL=redis://crimes_redis_cache
+            - PG_PORT=54321
+            - PG_PASSWORD=postgres
+            - PG_USER=postgres
+            - PG_NAME=postgres
+            - PG_HOST=host.docker.internal
+            - KAFKA_ADVERTISED_HOST_NAME=host.docker.internal
+            - MONGO_DEV_DB=mongodb://host.docker.internal:27017
+        command: npm run start
+
+    pg_container:
+        environment:
+            - POSTGRES_DB=${PG_NAME}
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+        ports:
+            - "54321:5432"
+        restart: always
+
+    mongodb_container:
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: rootpassword
+        ports:
+            - 27017:27017
